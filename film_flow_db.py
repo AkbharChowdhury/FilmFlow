@@ -35,7 +35,7 @@ class FilmFlowDB:
             movies = [dict(row) for row in cursor.fetchall()]
             return sorted(movies, key=lambda m: m.get("title", ""))
 
-    def fetch_movie_genres(self) -> list[Genre]:
+    def fetch_available_genres(self) -> list[Genre]:
         with get_cursor(query="SELECT genre, genre_id FROM available_movie_genres",
                         cursor_factory=DictCursor) as cursor:
             return list((Genre(name=row['genre'], genre_id=row['genre_id']) for row in cursor.fetchall()))
@@ -60,7 +60,7 @@ class FilmFlowDB:
         with get_cursor(query=query, params=params):
             pass
 
-    def delete(self, id_field: str, table: str, num: int) -> None:
+    def delete_record(self, id_field: str, table: str, num: int) -> None:
         params = {"num": num}
         with get_cursor(query=f"DELETE FROM {table} WHERE {id_field} = {self.__field('num')}", params=params):
             pass
