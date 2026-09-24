@@ -4,6 +4,5 @@ if __name__ == "__main__":
 
     db = FilmFlowDB()
 
-    for movie in db.fetch_movies(genre='horror'):
+    for movie in db.fetch_movies(genre='Comedy'):
         print(movie)
-        print('x')

@@ -16,7 +16,7 @@ def get_cursor(
         cursor_factory: Optional[Any] = None
 ):
     if params is None:
-        params = {}  # Empty dict for named params, not tuple
+        params = {}
     with connect(**load_config()) as conn:
         with conn.cursor(cursor_factory=cursor_factory) as cursor:
             if query:
