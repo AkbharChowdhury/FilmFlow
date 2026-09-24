@@ -1,0 +1,3 @@
+# PostgreSQL database adapter (precompiled binary)
+psycopg2-binary>=2.9.13
+pydantic>=2.13
