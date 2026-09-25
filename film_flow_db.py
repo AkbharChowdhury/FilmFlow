@@ -22,16 +22,20 @@ def get_cursor(
         yield cursor
 
 
-class FilmFlowDB:
-    def __field(self, name: str) -> str:
-        return f"%({name})s"
+def field(name: str) -> str:
+    """Format a field name as a parameter placeholder: e.g. 'title' → '%(title)s'"""
+    return f"%({name})s"
 
-    def fetch_movies(self, title: str = "", genre=""):
+
+class FilmFlowDB:
+
+    def fetch_movies(self, title: str = "", genre="") -> list:
         query = """
             SELECT movie_id, title, genres
             FROM fn_get_movies(%s, %s)
         """
         params = (f"%{title}%", f"%{genre}%")
+
         with get_cursor(query=query, params=params, cursor_factory=DictCursor) as cursor:
             movies = (dict(row) for row in cursor.fetchall())
             return list(movies)
@@ -54,8 +58,8 @@ class FilmFlowDB:
     def update_movie_title(self, movie_id: int, title: str) -> None:
         query = f"""
                UPDATE movies
-               SET title = {self.__field('title')}
-               WHERE movie_id = {self.__field('movie_id')}
+               SET title = {field('title')}
+               WHERE movie_id = {field('movie_id')}
            """
         params = {"title": title, "movie_id": movie_id}
         with get_cursor(query=query, params=params):
@@ -63,13 +67,13 @@ class FilmFlowDB:
 
     def delete_record(self, id_field: str, table: str, num: int) -> None:
         params = {"num": num}
-        with get_cursor(query=f"DELETE FROM {table} WHERE {id_field} = {self.__field('num')}", params=params):
+        with get_cursor(query=f"DELETE FROM {table} WHERE {id_field} = {field('num')}", params=params):
             pass
 
     def add_movie_genres(self, movie_id: int, genre_id_list: set[int]) -> None:
         query = f'''
             INSERT INTO movie_genres (movie_id, genre_id)
-            VALUES ({self.__field('movie_id')}, {self.__field('genre_id')})
+            VALUES ({field('movie_id')}, {field('genre_id')})
         '''
         for genre_id in genre_id_list:
             row: dict[str, int] = MovieGenre(movie_id=movie_id, genre_id=genre_id).model_dump()
