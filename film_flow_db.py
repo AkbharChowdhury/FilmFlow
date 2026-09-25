@@ -5,10 +5,7 @@ from psycopg2 import connect
 from config import load_config
 from contextlib import contextmanager
 
-from models.genres import Genre
-from models.movie_genres import MovieGenre
-
-
+from models import Genre, MovieGenre
 @contextmanager
 def get_cursor(
         query: None,

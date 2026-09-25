@@ -1,6 +1,5 @@
-
 from film_flow_db import FilmFlowDB
-from models.film import Movie
+from models import Movie
 
 
 def main():
