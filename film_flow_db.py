@@ -11,17 +11,15 @@ from models.movie_genres import MovieGenre
 
 @contextmanager
 def get_cursor(
-        query: Optional[str] = None,
+        query: None,
         params: Optional[Dict[str, Any]] = None,
         cursor_factory: Optional[Any] = None
 ):
     if params is None:
         params = {}
-    with connect(**load_config()) as conn:
-        with conn.cursor(cursor_factory=cursor_factory) as cursor:
-            if query:
-                cursor.execute(query, params)
-            yield cursor
+    with connect(**load_config()) as conn, conn.cursor(cursor_factory=cursor_factory) as cursor:
+        cursor.execute(query, params)
+        yield cursor
 
 
 class FilmFlowDB:
@@ -29,11 +27,14 @@ class FilmFlowDB:
         return f"%({name})s"
 
     def fetch_movies(self, title: str = "", genre=""):
-        query = "SELECT movie_id, title, genres FROM fn_get_movies(%s, %s)"
+        query = """
+            SELECT movie_id, title, genres
+            FROM fn_get_movies(%s, %s)
+        """
         params = (f"%{title}%", f"%{genre}%")
         with get_cursor(query=query, params=params, cursor_factory=DictCursor) as cursor:
-            movies = [dict(row) for row in cursor.fetchall()]
-            return sorted(movies, key=lambda m: m.get("title", ""))
+            movies = (dict(row) for row in cursor.fetchall())
+            return list(movies)
 
     def fetch_available_genres(self) -> list[Genre]:
         with get_cursor(query="SELECT genre, genre_id FROM available_movie_genres",
