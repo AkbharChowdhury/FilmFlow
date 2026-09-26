@@ -6,10 +6,12 @@ from config import load_config
 from contextlib import contextmanager
 
 from models import Genre, MovieGenre
+
+
 @contextmanager
 def get_cursor(
-        query: None,
-        params: Optional[Dict[str, Any]] = None,
+        query: str,
+        params: Optional[Dict[str, str]] = None,
         cursor_factory: Optional[Any] = None
 ):
     if params is None:
@@ -26,16 +28,23 @@ def field(name: str) -> str:
 
 class FilmFlowDB:
 
-    def fetch_movies(self, title: str = "", genre="") -> list:
-        query = """
-            SELECT movie_id, title, genres
-            FROM fn_get_movies(%s, %s)
+    def fetch_movies(self, title: str = "", genre=""):
         """
-        params = (f"%{title}%", f"%{genre}%")
+        Fetch movies by optional title and genre filters
+        :param title:
+        :param genre:
+        """
+        query = """
+        SELECT movie_id, title, genres
+        FROM fn_get_movies(%s, %s)
+        """
+        params = (f"%{title.strip()}%", f"%{genre.strip()}%")
 
-        with get_cursor(query=query, params=params, cursor_factory=DictCursor) as cursor:
-            movies = (dict(row) for row in cursor.fetchall())
-            return list(movies)
+        with get_cursor(query, params, cursor_factory=DictCursor) as cursor:
+            for row in cursor:
+                yield dict(row)
+
+            # return [dict(row) for row in cursor.fetchall()]
 
     def fetch_available_genres(self) -> list[Genre]:
         with get_cursor(query="SELECT genre, genre_id FROM available_movie_genres",

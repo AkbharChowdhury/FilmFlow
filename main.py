@@ -4,7 +4,8 @@ from models import Movie
 
 def main():
     db = FilmFlowDB()
-    movies = Movie.sort(db.fetch_movies(genre='comedy'))
+    movies: list[dict] = list(db.fetch_movies(genre='comedy'))
+    movies = Movie.sort(movies)
     for movie in movies:
         print(f"{movie['title']} ({movie['genres']})")
 
