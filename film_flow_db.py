@@ -1,11 +1,10 @@
 from typing import Any, Optional, Dict
 
-from psycopg2.extras import DictCursor
+from psycopg2.extras import DictCursor, execute_values
 from psycopg2 import connect
 from config import load_config
 from contextlib import contextmanager
-
-from models import Genre, MovieGenre
+from models import Genre
 
 
 @contextmanager
@@ -44,8 +43,6 @@ class FilmFlowDB:
             for row in cursor:
                 yield dict(row)
 
-            # return [dict(row) for row in cursor.fetchall()]
-
     def fetch_available_genres(self) -> list[Genre]:
         with get_cursor(query="SELECT genre, genre_id FROM available_movie_genres",
                         cursor_factory=DictCursor) as cursor:
@@ -76,12 +73,23 @@ class FilmFlowDB:
         with get_cursor(query=f"DELETE FROM {table} WHERE {id_field} = {field('num')}", params=params):
             pass
 
+    # def add_movie_genres(self, movie_id: int, genre_id_list: set[int]) -> None:
+    #     query = f'''
+    #         INSERT INTO movie_genres (movie_id, genre_id)
+    #         VALUES ({field('movie_id')}, {field('genre_id')})
+    #     '''
+    #     for genre_id in genre_id_list:
+    #         row = MovieGenre(movie_id=movie_id, genre_id=genre_id).model_dump()
+    #         with get_cursor(query=query, params=row):
+    #             pass
+
     def add_movie_genres(self, movie_id: int, genre_id_list: set[int]) -> None:
-        query = f'''
-            INSERT INTO movie_genres (movie_id, genre_id)
-            VALUES ({field('movie_id')}, {field('genre_id')})
-        '''
-        for genre_id in genre_id_list:
-            row: dict[str, int] = MovieGenre(movie_id=movie_id, genre_id=genre_id).model_dump()
-            with get_cursor(query=query, params=row):
-                pass
+        with connect(**load_config()) as conn, conn.cursor(cursor_factory=DictCursor) as cursor:
+            execute_values(
+                cursor,
+                """
+                INSERT INTO movie_genres (movie_id, genre_id)
+                VALUES %s
+                """,
+                [(movie_id, genre_id) for genre_id in genre_id_list],
+            )
