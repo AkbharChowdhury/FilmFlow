@@ -30,8 +30,8 @@ class FilmFlowDB:
     def fetch_movies(self, title: str = "", genre=""):
         """
         Fetch movies by optional title and genre filters
-        :param title:
-        :param genre:
+        :param title: str
+        :param genre: str
         """
         query = """
         SELECT movie_id, title, genres

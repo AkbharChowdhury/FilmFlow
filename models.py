@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from pydantic import BaseModel, ConfigDict, NonNegativeInt, Field
 from typing import Union, Any
 from uuid import uuid4
@@ -14,8 +16,11 @@ class Genre(BaseModel):
     name: str
     genre_id: Union[str, int] = Field(default_factory=lambda: str(uuid4()))
 
-
+@dataclass
 class Movie:
+    title: str
+    genres: set[int]
+
     @staticmethod
     def sort(movies: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for movie in movies:
