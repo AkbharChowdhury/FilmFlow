@@ -1,20 +1,15 @@
 from dataclasses import dataclass
 
-from pydantic import BaseModel, ConfigDict, NonNegativeInt, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Union, Any
 from uuid import uuid4
-
-
-class MovieGenre(BaseModel):
-    model_config = ConfigDict(frozen=True)
-    movie_id: NonNegativeInt
-    genre_id: NonNegativeInt
 
 
 class Genre(BaseModel):
     model_config = ConfigDict(frozen=True)
     name: str
     genre_id: Union[str, int] = Field(default_factory=lambda: str(uuid4()))
+
 
 @dataclass
 class Movie:
