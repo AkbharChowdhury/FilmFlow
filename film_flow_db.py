@@ -59,7 +59,7 @@ class FilmFlowDB:
             pass
 
     def update_movie_title(self, movie_id: int, title: str) -> None:
-        query = f"""
+        query: str = f"""
                UPDATE movies
                SET title = {field('title')}
                WHERE movie_id = {field('movie_id')}
