@@ -39,23 +39,23 @@ class FilmFlowDB:
         """
         params = (f"%{title.strip()}%", f"%{genre.strip()}%")
 
-        with get_cursor(query, params, cursor_factory=DictCursor) as cursor:
-            for row in cursor:
-                yield dict(row)
+        with get_cursor(query, params, cursor_factory=DictCursor) as movies:
+            for movie in movies:
+                yield dict(movie)
 
     def fetch_available_genres(self) -> list[Genre]:
         with get_cursor(query="SELECT genre, genre_id FROM available_movie_genres",
-                        cursor_factory=DictCursor) as cursor:
-            return list((Genre(name=row['genre'], genre_id=row['genre_id']) for row in cursor.fetchall()))
+                        cursor_factory=DictCursor) as genres:
+            return list((Genre(name=genre['genre'], genre_id=genre['genre_id']) for genre in genres.fetchall()))
 
     def fetch_all_genres(self) -> list[Genre]:
         with get_cursor(query="SELECT genre AS name, genre_id FROM genres ORDER BY genre",
-                        cursor_factory=DictCursor) as cursor:
-            return list(Genre(**dict(row)) for row in cursor.fetchall())
+                        cursor_factory=DictCursor) as genres:
+            return list(Genre(**dict(genre)) for genre in genres.fetchall())
 
     def add_movie_and_genres(self, title: str, genres: set[int]) -> None:
         with get_cursor(query="CALL pr_add_movie_and_genres(%s,%s)", params=(title, str(genres)),
-                        cursor_factory=DictCursor) as cursor:
+                        cursor_factory=DictCursor) as _:
             pass
 
     def update_movie_title(self, movie_id: int, title: str) -> None:
