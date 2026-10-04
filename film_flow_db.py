@@ -49,8 +49,8 @@ class FilmFlowDB:
             return list((Genre(name=genre['genre'], genre_id=genre['genre_id']) for genre in genres.fetchall()))
 
     def fetch_all_genres(self) -> list[Genre]:
-        with get_cursor(query="SELECT genre AS name, genre_id FROM genres ORDER BY genre",
-                        cursor_factory=DictCursor) as genres:
+        query: str = 'SELECT genre AS name, genre_id FROM genres ORDER BY genre'
+        with get_cursor(query=query, cursor_factory=DictCursor) as genres:
             return list(Genre(**dict(genre)) for genre in genres.fetchall())
 
     def add_movie_and_genres(self, title: str, genres: set[int]) -> None:
@@ -64,16 +64,16 @@ class FilmFlowDB:
                SET title = {field('title')}
                WHERE movie_id = {field('movie_id')}
            """
-        params = {"title": title, "movie_id": movie_id}
+        params = {'title': title, 'movie_id': movie_id}
         with get_cursor(query=query, params=params):
             pass
 
     def delete_record(self, id_field: str, table: str, num: int) -> None:
-        params = {"num": num}
+        params = {'num': num}
         with get_cursor(query=f"DELETE FROM {table} WHERE {id_field} = {field('num')}", params=params):
             pass
 
-    def add_movie_genres(self, movie_id: int, genre_id_list: set[int]) -> None:
+    def add_movie_genres(self, movie_id: int, genre_id_set: set[int]) -> None:
         with connect(**load_config()) as conn, conn.cursor(cursor_factory=DictCursor) as cursor:
             execute_values(
                 cursor,
@@ -81,5 +81,5 @@ class FilmFlowDB:
                 INSERT INTO movie_genres (movie_id, genre_id)
                 VALUES %s
                 """,
-                [(movie_id, genre_id) for genre_id in genre_id_list],
+                [(movie_id, genre_id) for genre_id in genre_id_set],
             )
