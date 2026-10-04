@@ -54,8 +54,8 @@ class FilmFlowDB:
             return list(Genre(**dict(genre)) for genre in genres.fetchall())
 
     def add_movie_and_genres(self, title: str, genres: set[int]) -> None:
-        with get_cursor(query="CALL pr_add_movie_and_genres(%s,%s)", params=(title, str(genres)),
-                        cursor_factory=DictCursor) as _:
+        query: str = 'CALL pr_add_movie_and_genres(%s,%s)'
+        with get_cursor(query=query, params=(title, str(genres)), cursor_factory=DictCursor) as _:
             pass
 
     def update_movie_title(self, movie_id: int, title: str) -> None:
