@@ -33,7 +33,7 @@ class FilmFlowDB:
         :param title: str
         :param genre: str
         """
-        query = """
+        query: str = """
         SELECT movie_id, title, genres
         FROM fn_get_movies(%s, %s)
         """
@@ -44,8 +44,8 @@ class FilmFlowDB:
                 yield dict(movie)
 
     def fetch_available_genres(self) -> list[Genre]:
-        with get_cursor(query="SELECT genre, genre_id FROM available_movie_genres",
-                        cursor_factory=DictCursor) as genres:
+        query: str = 'SELECT genre, genre_id FROM available_movie_genres'
+        with get_cursor(query=query, cursor_factory=DictCursor) as genres:
             return list((Genre(name=genre['genre'], genre_id=genre['genre_id']) for genre in genres.fetchall()))
 
     def fetch_all_genres(self) -> list[Genre]:
@@ -54,7 +54,7 @@ class FilmFlowDB:
             return list(Genre(**dict(genre)) for genre in genres.fetchall())
 
     def add_movie_and_genres(self, title: str, genres: set[int]) -> None:
-        query: str = 'CALL pr_add_movie_and_genres(%s,%s)'
+        query: str = 'CALL pr_add_movie_and_genres(%s, %s)'
         with get_cursor(query=query, params=(title, str(genres)), cursor_factory=DictCursor) as _:
             pass
 
@@ -70,7 +70,8 @@ class FilmFlowDB:
 
     def delete_record(self, id_field: str, table: str, num: int) -> None:
         params = {'num': num}
-        with get_cursor(query=f"DELETE FROM {table} WHERE {id_field} = {field('num')}", params=params):
+        query: str = f"DELETE FROM {table} WHERE {id_field} = {field('num')}"
+        with get_cursor(query=query, params=params):
             pass
 
     def add_movie_genres(self, movie_id: int, genre_id_set: set[int]) -> None:
