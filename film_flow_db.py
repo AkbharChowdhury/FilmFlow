@@ -22,7 +22,7 @@ def get_cursor(
 
 def field(name: str) -> str:
     """Format a field name as a parameter placeholder: e.g. 'title' → '%(title)s'"""
-    return f"%({name})s"
+    return f'%({name})s'
 
 
 class FilmFlowDB:
@@ -64,7 +64,10 @@ class FilmFlowDB:
                SET title = {field('title')}
                WHERE movie_id = {field('movie_id')}
            """
-        params = {'title': title, 'movie_id': movie_id}
+        params: dict[str, Any] = {
+            'title': title,
+            'movie_id': movie_id
+        }
         with get_cursor(query=query, params=params):
             pass
 
