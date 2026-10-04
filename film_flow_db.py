@@ -74,10 +74,7 @@ class FilmFlowDB:
             pass
 
     def add_movie_genres(self, movie_id: int, genre_id_set: set[int]) -> None:
-        query: str = """
-        INSERT INTO movie_genres (movie_id, genre_id)
-                VALUES %s
-        """
+        query: str = 'INSERT INTO movie_genres (movie_id, genre_id) VALUES %s'
         with connect(**load_config()) as conn, conn.cursor(cursor_factory=DictCursor) as cursor:
             execute_values(
                 cursor,
