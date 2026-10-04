@@ -13,7 +13,7 @@ def add_film(movie: Movie):
 
 
 def main():
-    movies: list[dict] = list(db.fetch_movies(genre='Horror'))
+    movies: list[dict] = list(db.fetch_movies())
     display_films(Movie.sort(movies))
 
 
